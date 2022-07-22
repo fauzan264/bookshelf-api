@@ -1,4 +1,4 @@
-const {uuid} = require('uuidv4');
+const uuid = require('uuidv4');
 const books = require('./books');
 
 const addBookHandler = (request, h) => {
@@ -33,7 +33,7 @@ const addBookHandler = (request, h) => {
     updatedAt,
   };
 
-  if (newBook.name === '') {
+  if (newBook.name === '' || newBook.name === undefined) {
     const response = h.response({
       status: 'fail',
       message: 'Gagal menambahkan buku. Mohon isi nama buku',
