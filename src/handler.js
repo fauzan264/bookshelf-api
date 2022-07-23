@@ -14,6 +14,25 @@ const addBookHandler = (request, h) => {
     reading,
   } = request.payload;
 
+  if (name === '' || name === undefined) {
+    const response = h.response({
+      status: 'fail',
+      message: 'Gagal menambahkan buku. Mohon isi nama buku',
+    });
+    response.code(400);
+    return response;
+  }
+
+  if (readPage > pageCount) {
+    const response = h.response({
+      status: 'fail',
+      // eslint-disable-next-line max-len
+      message: 'Gagal menambahkan buku. readPage tidak boleh lebih besar dari pageCount',
+    });
+    response.code(400);
+    return response;
+  }
+
   const id = uuid.uuid();
   const insertedAt= new Date().toISOString();
   const updatedAt = insertedAt;
@@ -32,25 +51,6 @@ const addBookHandler = (request, h) => {
     insertedAt,
     updatedAt,
   };
-
-  if (newBook.name === '' || newBook.name === undefined) {
-    const response = h.response({
-      status: 'fail',
-      message: 'Gagal menambahkan buku. Mohon isi nama buku',
-    });
-    response.code(400);
-    return response;
-  }
-
-  if (newBook.readPage > newBook.pageCount) {
-    const response = h.response({
-      status: 'fail',
-      // eslint-disable-next-line max-len
-      message: 'Gagal menambahkan buku. readPage tidak boleh lebih besar dari pageCount',
-    });
-    response.code(500);
-    return response;
-  }
 
   books.push(newBook);
 
@@ -100,7 +100,75 @@ const getBookByIdHandler = (request, h) => {
 
   const response = h.response({
     status: 'fail',
-    message: 'Catatan tidak ditemukan',
+    message: 'Buku tidak ditemukan',
+  });
+  response.code(404);
+  return response;
+};
+
+const editBookByIdHandler = (request, h) => {
+  const {id} = request.params;
+
+  const {
+    name,
+    year,
+    author,
+    summary,
+    publisher,
+    pageCount,
+    finished,
+    readPage,
+    reading,
+  } = request.payload;
+
+  if (name === '' || name === undefined) {
+    const response = h.response({
+      status: 'fail',
+      message: 'Gagal memperbarui buku. Mohon isi nama buku',
+    });
+    response.code(400);
+    return response;
+  }
+
+  if (readPage > pageCount) {
+    const response = h.response({
+      status: 'fail',
+      // eslint-disable-next-line max-len
+      message: 'Gagal memperbarui buku. readPage tidak boleh lebih besar dari pageCount',
+    });
+    response.code(400);
+    return response;
+  }
+
+  const updatedAt = new Date().toISOString();
+  const index = books.findIndex((book) => book.id === id);
+
+  if (index !== -1) {
+    books[index] = {
+      ...books[index],
+      name,
+      year,
+      author,
+      summary,
+      publisher,
+      pageCount,
+      readPage,
+      finished,
+      reading,
+      updatedAt,
+    };
+
+    const response = h.response({
+      status: 'success',
+      message: 'Buku berhasil diperbarui',
+    });
+    response.code(200);
+    return response;
+  }
+
+  const response = h.response({
+    status: 'fail',
+    message: 'Gagal memperbarui buku. Id tidak ditemukan',
   });
   response.code(404);
   return response;
@@ -132,5 +200,6 @@ module.exports = {
   addBookHandler,
   getAllBookHandler,
   getBookByIdHandler,
+  editBookByIdHandler,
   deleteBookByIdHandler,
 };
