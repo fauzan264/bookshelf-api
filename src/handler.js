@@ -77,6 +77,35 @@ const addBookHandler = (request, h) => {
   return response;
 };
 
+const getAllBookHandler = () => ({
+  status: 'success',
+  data: {
+    books,
+  },
+});
+
+const getBookByIdHandler = (request, h) => {
+  const {id} = request.params;
+
+  const book = books.filter((b) => b.id === id)[0];
+
+  if (book !== undefined) {
+    return {
+      status: 'success',
+      data: {
+        book,
+      },
+    };
+  }
+
+  const response = h.response({
+    status: 'fail',
+    message: 'Catatan tidak ditemukan',
+  });
+  response.code(404);
+  return response;
+};
+
 const deleteBookByIdHandler = (request, h) => {
   const {id} = request.params;
 
@@ -101,5 +130,7 @@ const deleteBookByIdHandler = (request, h) => {
 
 module.exports = {
   addBookHandler,
+  getAllBookHandler,
+  getBookByIdHandler,
   deleteBookByIdHandler,
 };
