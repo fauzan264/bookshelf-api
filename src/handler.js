@@ -9,7 +9,6 @@ const addBookHandler = (request, h) => {
     summary,
     publisher,
     pageCount,
-    finished,
     readPage,
     reading,
   } = request.payload;
@@ -36,6 +35,7 @@ const addBookHandler = (request, h) => {
   const id = uuid.uuid();
   const insertedAt= new Date().toISOString();
   const updatedAt = insertedAt;
+  const finished = pageCount === readPage;
 
   const newBook = {
     id,
@@ -79,9 +79,11 @@ const addBookHandler = (request, h) => {
 
 const getAllBookHandler = () => ({
   status: 'success',
-  data: {
-    books,
-  },
+  books: books.map((book) => ({
+    id: book.id,
+    name: book.name,
+    publisher: book.publisher,
+  })),
 });
 
 const getBookByIdHandler = (request, h) => {
@@ -116,7 +118,6 @@ const editBookByIdHandler = (request, h) => {
     summary,
     publisher,
     pageCount,
-    finished,
     readPage,
     reading,
   } = request.payload;
@@ -140,6 +141,7 @@ const editBookByIdHandler = (request, h) => {
     return response;
   }
 
+  const finished = pageCount === readPage;
   const updatedAt = new Date().toISOString();
   const index = books.findIndex((book) => book.id === id);
 
